@@ -1,6 +1,14 @@
 Markdown
 
 # 📡 AWS Cloud Virtual Headend - Hybrid Transmission Architecture
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Terraform-1.5%2B-7B42BC?logo=terraform&logoColor=white" alt="Terraform Version">
+  <img src="https://img.shields.io/badge/AWS-Elemental_MediaConnect-FF9900?logo=amazon-aws&logoColor=white" alt="AWS MediaConnect">
+  <img src="https://img.shields.io/badge/Protocol-SRT_|_IPSec-007ACC" alt="Protocols">
+  <img src="https://img.shields.io/badge/Infrastructure-as_Code-green" alt="IaC">
+</p>
+
 > **Enterprise-grade Infrastructure as Code (IaC) for Resilient Cloud-native Broadcast Workflows.** > *Infraestrutura como Código de classe corporativa para fluxos de transmissão resilientes e nativos em nuvem.*
 
 ---
@@ -22,35 +30,52 @@ This repository hosts a production-ready, highly available **Virtual Headend and
 ### 🧱 Architectural Highlights & Network Flow
 The infrastructure is segmented into specialized modules designed for high availability:
 
-1. **Hybrid Network Module (`vpc_network`):**
+1. **Hybrid Network Module (`modules/vpc_network`):**
    * Creates a dedicated, isolated Transmission VPC.
    * Provisions an **AWS Transit Gateway (TGW)** acting as the central transit hub.
    * Configures redundant **AWS Site-to-Site VPNs** with **ECMP (Equal-Cost Multi-Path)** active-active routing to safely ingest streams from the physical studio across distinct ISPs.
-2. **Media Security Module (`media_services`):**
+2. **Media Security Module (`modules/media_services`):**
    * Deploys strict stateful firewall rules (Security Groups) permitting only authenticated incoming SRT handshakes on port `5000`.
-3. **Transport Pipeline (`media_connect`):**
-   * provisions **AWS Elemental MediaConnect** flows inside private subnets using a secure VPC Interface.
+3. **Transport Pipeline (`modules/media_connect`):**
+   * Provisions **AWS Elemental MediaConnect** flows inside private subnets using a secure VPC Interface.
    * Configured as an **SRT Listener** to ingest high-bitrate live video feeds (up to 20 Mbps) with low latency.
 
 ---
 
-### 🛠️ Tech Stack
-* **IaC Tool:** Terraform (v1.5+)
-* **Providers:** * `hashicorp/aws` (Standard AWS Resources)
-  * `hashicorp/awscc` (AWS Cloud Control API for optimized MediaConnect deployment)
-* **Core Services:** AWS Elemental MediaConnect, AWS Transit Gateway, AWS Site-to-Site VPN, AWS VPC, AWS IAM.
-* **Transport Protocols:** SRT (Secure Reliable Transport) & IPsec.
+### 📂 Repository Structure
+```text
+.
+├── main.tf                    # Main Terraform configuration (Module orchestration)
+├── variables.tf               # Global variables
+├── outputs.tf                 # Global outputs
+├── .gitignore                 # Secure git exclusions (ignores state and personal vars)
+└── modules/
+    ├── vpc_network/           # VPC, Subnets, Internet Gateway, and VPN configurations
+    ├── media_services/        # Security Groups and media-specific access control
+    └── media_connect/         # AWS Elemental MediaConnect flow definition
 
----
+🛠️ Tech Stack
 
-### 🚀 How to Deploy
+    IaC Tool: Terraform (v1.5+)
 
-#### Prerequisites
-1. Installed **Terraform CLI** (v1.5.0 or superior).
-2. Configured **AWS CLI** with appropriate administrator credentials (`aws configure`).
+    Providers: * hashicorp/aws (Standard AWS Resources)
 
-#### Commands
-```bash
+        hashicorp/awscc (AWS Cloud Control API for optimized MediaConnect deployment)
+
+    Core Services: AWS Elemental MediaConnect, AWS Transit Gateway, AWS Site-to-Site VPN, AWS VPC, AWS IAM.
+
+    Transport Protocols: SRT (Secure Reliable Transport) & IPsec.
+
+🚀 How to Deploy
+Prerequisites
+
+    Installed Terraform CLI (v1.5.0 or superior).
+
+    Configured AWS CLI with appropriate administrator credentials (aws configure).
+
+Commands
+Bash
+
 # 1. Clone the repository
 git clone [https://github.com/code-wfb/virtual-headend-broadcast.git](https://github.com/code-wfb/virtual-headend-broadcast.git)
 cd virtual-headend-broadcast
@@ -90,7 +115,7 @@ Principais Benefícios:
 
 A infraestrutura está dividida em módulos especializados focados em alta disponibilidade:
 
-    Módulo de Rede Híbrida (vpc_network):
+    Módulo de Rede Híbrida (modules/vpc_network):
 
         Cria uma VPC dedicada e isolada para transmissão.
 
@@ -98,15 +123,28 @@ A infraestrutura está dividida em módulos especializados focados em alta dispo
 
         Estabelece conexões AWS Site-to-Site VPN redundantes com ECMP (Equal-Cost Multi-Path) ativo-ativo para receber os sinais do estúdio físico por provedores de internet (ISPs) distintos.
 
-    Módulo de Segurança (media_services):
+    Módulo de Segurança (modules/media_services):
 
         Implementa regras estritas de firewall (Security Groups) que liberam apenas tráfego SRT autenticado na porta de entrada 5000.
 
-    Pipeline de Transporte de Mídia (media_connect):
+    Pipeline de Transporte de Mídia (modules/media_connect):
 
         Provisiona fluxos do AWS Elemental MediaConnect associados de forma privada à VPC por meio de uma VPC Interface.
 
         Configurado no modo SRT Listener para recepção estável de feeds de alta taxa de bits (até 20 Mbps) com baixa latência.
+
+📂 Estrutura do Repositório
+Plaintext
+
+.
+├── main.tf                    # Arquivo principal do Terraform (Orquestração de Módulos)
+├── variables.tf               # Variáveis globais
+├── outputs.tf                 # Outputs globais
+├── .gitignore                 # Exclusões seguras do Git (ignora estados e variáveis locais)
+└── modules/
+    ├── vpc_network/           # Configuração de VPC, Subnets, Internet Gateway e VPNs
+    ├── media_services/        # Security Groups e controle de acesso de mídia
+    └── media_connect/         # Definição dos fluxos do AWS Elemental MediaConnect
 
 🛠️ Tecnologias Utilizadas
 
