@@ -1,0 +1,1 @@
+output "media_security_group_id" { value = aws_security_group.media_processing_sg.id }

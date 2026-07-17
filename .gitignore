@@ -1,0 +1,22 @@
+# Local .terraform folder (Binários e plugins - ocupam centenas de MBs)
+**/.terraform/*
+
+# Arquivos de estado do Terraform (CONTÊM SEGREDOS EM TEXTO CLARO!)
+*.tfstate
+*.tfstate.*
+
+# Arquivos de variáveis locais (onde você coloca chaves/IPs reais)
+*.tfvars
+*.tfvars.json
+
+# Arquivos de configuração pessoal do CLI
+.terraformrc
+terraform.rc
+
+# Logs de travamento ou crash logs
+crash.log
+crash.*.log
+
+# Arquivos específicos do VS Code ou SO
+.vscode/
+.DS_Store
