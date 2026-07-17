@@ -1,67 +1,152 @@
-Markdown# 📡 AWS Cloud Virtual Headend - Hybrid Transmission Architecture
-> *Arquitetura de Transmissão Híbrida e Resiliente em Nuvem para Broadcast*
+Markdown
 
-| 🇺🇸 English Version | 🇧🇷 Versão em Português |
-| :--- | :--- |
-| This repository contains the Infrastructure as Code (IaC) in **Terraform** structured under the **AWS Well-Architected Framework** guidelines to virtualize a Master Control Room (MCR) and a regional television broadcast network. | Este repositório contém a infraestrutura como código (IaC) em **Terraform** estruturada sob as diretrizes do **AWS Well-Architected Framework** para virtualizar o Master Control Room (MCR) e o Headend de uma rede de transmissão de TV regional. |
+# 📡 AWS Cloud Virtual Headend - Hybrid Transmission Architecture
+> **Enterprise-grade Infrastructure as Code (IaC) for Resilient Cloud-native Broadcast Workflows.** > *Infraestrutura como Código de classe corporativa para fluxos de transmissão resilientes e nativos em nuvem.*
 
 ---
 
-## 🗺️ System Architecture / *Arquitetura do Sistema*
+## 🇺🇸 English Version
 
-```mermaid
-graph TD
-    %% Nós do On-Premises
-    subgraph On_Premises [On-Premises / Physical Studio]
-        Encoder[SRT Encoder / Playout] -->|SRT Stream| CGW_A[Customer Gateway - ISP A]
-        Encoder -->|SRT Stream| CGW_B[Customer Gateway - ISP B]
-    end
+### 🎯 Business Case & Overview
+Traditional television and broadcast operations historically depend on dense, high-cost on-premises SDI hardware, local physical Master Control Rooms (MCRs), and discrete commercial playout servers at every regional affiliate station. This traditional model features high CapEx, complex physical maintenance, and isolated operations.
 
-    %% Fluxo de Trânsito para a Nuvem
-    CGW_A -->|VPN Tunnel 1 - ECMP| TGW[AWS Transit Gateway]
-    CGW_B -->|VPN Tunnel 2 - ECMP| TGW
+This repository hosts a production-ready, highly available **Virtual Headend and Hybrid Network Architecture** built strictly under the **AWS Well-Architected Framework (Reliability and Security pillars)**. It leverages **Terraform** to orchestrate cloud-native live video transport and secure site-to-site connectivity.
 
-    %% Estrutura da VPC
-    subgraph Transmission_VPC [Transmission VPC - 10.100.0.0/16]
-        TGW -->|VPC Attachment| Private_Subnet_A
-        TGW -->|VPC Attachment| Private_Subnet_B
+#### Key Benefits:
+* **75% CapEx Reduction:** Replaces regional physical playout and SDI matrices with cloud-native virtual resources.
+* **Operational Consolidation:** Centralizes multiple regional monitoring outputs into a unified cloud interface.
+* **Active-Active Redundancy:** Resilient video acquisition pipeline over commercial internet connections.
 
-        subgraph Public_Subnets [Public Subnets]
-            Pub_A[Subnet 1A - 10.100.1.0/24]
-            Pub_B[Subnet 1B - 10.100.2.0/24]
-        end
+---
 
-        subgraph Private_Subnets [Private Subnets]
-            Private_Subnet_A[Subnet 2A - 10.100.10.0/24]
-            Private_Subnet_B[Subnet 2B - 10.100.20.0/24]
-            
-            %% Elementos do MediaConnect
-            EMX_Interface[VPC Interface] --> EMX_Flow[MediaConnect Flow - SRT Port 5000]
-        end
-        
-        SG[Media Security Group] -.->|Allows Port 5000| EMX_Flow
-    end
+### 🧱 Architectural Highlights & Network Flow
+The infrastructure is segmented into specialized modules designed for high availability:
 
-    %% Conexões de Roteamento Interno
-    Private_Subnet_A --> EMX_Interface
+1. **Hybrid Network Module (`vpc_network`):**
+   * Creates a dedicated, isolated Transmission VPC.
+   * Provisions an **AWS Transit Gateway (TGW)** acting as the central transit hub.
+   * Configures redundant **AWS Site-to-Site VPNs** with **ECMP (Equal-Cost Multi-Path)** active-active routing to safely ingest streams from the physical studio across distinct ISPs.
+2. **Media Security Module (`media_services`):**
+   * Deploys strict stateful firewall rules (Security Groups) permitting only authenticated incoming SRT handshakes on port `5000`.
+3. **Transport Pipeline (`media_connect`):**
+   * provisions **AWS Elemental MediaConnect** flows inside private subnets using a secure VPC Interface.
+   * Configured as an **SRT Listener** to ingest high-bitrate live video feeds (up to 20 Mbps) with low latency.
 
-    %% Estilização Direta (Segura para o parser do GitHub)
-    style TGW fill:#FF9900,stroke:#333,stroke-width:2px,color:#fff
-    style EMX_Interface fill:#FF9900,stroke:#333,stroke-width:2px,color:#fff
-    style EMX_Flow fill:#FF9900,stroke:#333,stroke-width:2px,color:#fff
-    style Encoder fill:#3F51B5,stroke:#333,stroke-width:2px,color:#fff
-    style CGW_A fill:#3F51B5,stroke:#333,stroke-width:2px,color:#fff
-    style CGW_B fill:#3F51B5,stroke:#333,stroke-width:2px,color:#fff
-🎯 Business Case & Objectives / Objetivos de Negócio🇺🇸 English🇧🇷 PortuguêsTraditional broadcast operations rely on heavy, expensive on-premises SDI hardware, local commercial playout servers, and graphics insertion per affiliate station.This architecture unifies multiple physical MCRs into a single AWS-hosted Virtual Headend, delivering up to 75% CapEx reduction and centralizing monitoring operations into a single web console.A operação de redes de TV tradicionais depende de hardware local SDI denso e caro em cada mercado regional, servidores de playout comerciais locais e inserção de gráficos por afiliada.Esta arquitetura centraliza múltiplos MCRs físicos em um único Virtual Headend unificado na AWS, obtendo até 75% de redução de CapEx e unificando o monitoramento.🛠️ Tech Stack / Tecnologias UtilizadasTerraform (v1.5+): Declarative multi-provider Infrastructure as Code.AWS & AWSCC Providers: Native Cloud Control API integration for bleeding-edge resources.AWS Elemental MediaConnect: High-quality video transport using SRT (Secure Reliable Transport) protocol.AWS Transit Gateway: Central hub routing IPsec VPN traffic with ECMP (Equal-Cost Multi-Path) active-active load balancing.🚀 How to Deploy / Como ExecutarPrerequisites / Pré-requisitosAWS CLI configured (aws configure)Terraform installed (v1.5.0+)Bash# 1. Clone the repo / Clone o repositório
+---
+
+### 🛠️ Tech Stack
+* **IaC Tool:** Terraform (v1.5+)
+* **Providers:** * `hashicorp/aws` (Standard AWS Resources)
+  * `hashicorp/awscc` (AWS Cloud Control API for optimized MediaConnect deployment)
+* **Core Services:** AWS Elemental MediaConnect, AWS Transit Gateway, AWS Site-to-Site VPN, AWS VPC, AWS IAM.
+* **Transport Protocols:** SRT (Secure Reliable Transport) & IPsec.
+
+---
+
+### 🚀 How to Deploy
+
+#### Prerequisites
+1. Installed **Terraform CLI** (v1.5.0 or superior).
+2. Configured **AWS CLI** with appropriate administrator credentials (`aws configure`).
+
+#### Commands
+```bash
+# 1. Clone the repository
 git clone [https://github.com/code-wfb/virtual-headend-broadcast.git](https://github.com/code-wfb/virtual-headend-broadcast.git)
 cd virtual-headend-broadcast
 
-# 2. Initialize working directory / Inicialize o diretório
+# 2. Initialize and download providers (AWS and AWSCC)
 terraform init
 
-# 3. Plan deployment / Verifique o plano
+# 3. Generate and review the execution plan
 terraform plan
 
-# 4. Apply infrastructure / Aplique a infraestrutura
+# 4. Provision the infrastructure on AWS
 terraform apply
-🔒 Security by Design / Segurança Aplicada🇺🇸 English🇧🇷 Português- Zero Hardcoded Secrets: All AWS credentials leverage IAM local profiles.- Private Networking: MediaConnect flows run inside private subnets.- Encrypted VPN: Redundant IPSec tunnels secure physical studio connectivity.- Zero Secrets Hardcoded: Credenciais AWS usam perfis locais via CLI.- Rede Privada: Fluxos do MediaConnect rodam protegidos dentro de subnets privadas.- VPN Criptografada: Túneis IPSec redundantes garantem tráfego seguro do estúdio físico.
+
+🔒 Security & Best Practices
+
+    Zero Secrets Hardcoded: No static credentials are kept in the codebase. All access relies on IAM instance profiles and local secure CLI environment variables.
+
+    Isolated Data Plane: Live video pipelines are kept entirely within private subnets. No public IP addresses are exposed.
+
+    Enterprise-grade Encryption: Video signals are ingested via IPSec-encrypted tunnels, and the SRT stream uses built-in cryptographic handshakes.
+
+🇧🇷 Versão em Português
+🎯 Caso de Negócio & Visão Geral
+
+As operações tradicionais de televisão e transmissão de vídeo dependem historicamente de hardware SDI local denso e caro, Master Control Rooms (MCRs) físicos e servidores de playout comerciais locais em cada geradora ou afiliada regional. Esse modelo tradicional exige alto CapEx, manutenção física complexa e dificulta a escala.
+
+Este repositório contém uma Arquitetura de Rede Híbrida e Virtual Headend altamente disponível e pronta para produção, desenvolvida sob as diretrizes do AWS Well-Architected Framework. O projeto utiliza Terraform para orquestrar transporte de vídeo ao vivo e conectividade híbrida segura.
+Principais Benefícios:
+
+    75% de Redução de CapEx: Substituição de servidores e matrizes SDI físicas por recursos virtuais e centralizados em nuvem.
+
+    Consolidação Operacional: Centraliza o monitoramento e gerenciamento de múltiplas afiliadas em um console unificado.
+
+    Redundância Ativa-Ativa: Pipeline de aquisição de vídeo resiliente operando através de conexões de internet comercial redundantes.
+
+🧱 Destaques da Arquitetura e Fluxo de Rede
+
+A infraestrutura está dividida em módulos especializados focados em alta disponibilidade:
+
+    Módulo de Rede Híbrida (vpc_network):
+
+        Cria uma VPC dedicada e isolada para transmissão.
+
+        Provisiona um AWS Transit Gateway (TGW) como hub de roteamento central.
+
+        Estabelece conexões AWS Site-to-Site VPN redundantes com ECMP (Equal-Cost Multi-Path) ativo-ativo para receber os sinais do estúdio físico por provedores de internet (ISPs) distintos.
+
+    Módulo de Segurança (media_services):
+
+        Implementa regras estritas de firewall (Security Groups) que liberam apenas tráfego SRT autenticado na porta de entrada 5000.
+
+    Pipeline de Transporte de Mídia (media_connect):
+
+        Provisiona fluxos do AWS Elemental MediaConnect associados de forma privada à VPC por meio de uma VPC Interface.
+
+        Configurado no modo SRT Listener para recepção estável de feeds de alta taxa de bits (até 20 Mbps) com baixa latência.
+
+🛠️ Tecnologias Utilizadas
+
+    Ferramenta de IaC: Terraform (v1.5+)
+
+    Provedores: * hashicorp/aws (Recursos AWS Padrão)
+
+        hashicorp/awscc (AWS Cloud Control API para otimização do MediaConnect)
+
+    Serviços Core: AWS Elemental MediaConnect, AWS Transit Gateway, AWS Site-to-Site VPN, AWS VPC, AWS IAM.
+
+    Protocolos: SRT (Secure Reliable Transport) & IPsec.
+
+🚀 Como Executar
+Pré-requisitos
+
+    Terraform CLI instalado (v1.5.0 ou superior).
+
+    AWS CLI configurado com credenciais locais válidas (aws configure).
+
+Comandos
+Bash
+
+# 1. Clone o repositório
+git clone [https://github.com/code-wfb/virtual-headend-broadcast.git](https://github.com/code-wfb/virtual-headend-broadcast.git)
+cd virtual-headend-broadcast
+
+# 2. Inicialize o diretório e baixe os provedores
+terraform init
+
+# 3. Valide o plano de execução
+terraform plan
+
+# 4. Aplique e construa a infraestrutura na AWS
+terraform apply
+
+🔒 Segurança & Boas Práticas
+
+    Zero Chaves no Código: Nenhuma credencial estática ou senha é armazenada no código. O acesso à AWS utiliza autenticação segura por perfis locais do IAM.
+
+    Isolamento de Rede: Os fluxos de transporte de vídeo rodam exclusivamente dentro de sub-redes privadas. Nenhum IP público direto é exposto para a internet.
+
+    Criptografia Fim-a-Fim: A transmissão do sinal do estúdio local para a AWS é encapsulada em túneis IPSec criptografados, somando-se à criptografia nativa do protocolo SRT.
