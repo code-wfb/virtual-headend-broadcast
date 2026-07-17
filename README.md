@@ -1,9 +1,9 @@
 Markdown# 📡 AWS Cloud Virtual Headend - Hybrid Transmission Architecture
-> *Arquitetura de Transmissão Híbrida e Resiliente em Nuvem*
+> *Arquitetura de Transmissão Híbrida e Resiliente em Nuvem para Broadcast*
 
 | 🇺🇸 English Version | 🇧🇷 Versão em Português |
 | :--- | :--- |
-| This repository contains the Infrastructure as Code (IaC) in **Terraform** structured under the **AWS Well-Architected Framework** guidelines to virtualize a Master Control Room (MCR) and a regional television broadcast network. | Este repositório contém a infraestrutura como código (IaC) em **Terraform** estruturada sob as diretrizes do **AWS Well-Architected Framework** para virtualizar o Master Control Room (MCR) e o Headend de uma rede de transmissão de TV. |
+| This repository contains the Infrastructure as Code (IaC) in **Terraform** structured under the **AWS Well-Architected Framework** guidelines to virtualize a Master Control Room (MCR) and a regional television broadcast network. | Este repositório contém a infraestrutura como código (IaC) em **Terraform** estruturada sob as diretrizes do **AWS Well-Architected Framework** para virtualizar o Master Control Room (MCR) e o Headend de uma rede de transmissão de TV regional. |
 
 ---
 
@@ -41,7 +41,7 @@ graph TD
                 
                 subgraph Media_Connect [AWS Elemental MediaConnect]
                     EMX_Interface[VPC Interface]:::aws
-                    EMX_Flow["MediaConnect Flow <br> srt-listener :5000"]:::aws
+                    EMX_Flow["MediaConnect Flow - SRT Listener: 5000"]:::aws
                     EMX_Interface --> EMX_Flow
                 end
             end
@@ -56,10 +56,8 @@ graph TD
     %% Aplicação de classes
     class Encoder,CGW_A,CGW_B onprem;
     class VPC,Public_Subnets,Private_Subnets box;
-
-
 🎯 Business Case & Objectives / Objetivos de Negócio🇺🇸 English🇧🇷 PortuguêsTraditional broadcast operations rely on heavy, expensive on-premises SDI hardware, local commercial playout servers, and graphics insertion per affiliate station.This architecture unifies multiple physical MCRs into a single AWS-hosted Virtual Headend, delivering up to 75% CapEx reduction and centralizing monitoring operations into a single web console.A operação de redes de TV tradicionais depende de hardware local SDI denso e caro em cada mercado regional, servidores de playout comerciais locais e inserção de gráficos por afiliada.Esta arquitetura centraliza múltiplos MCRs físicos em um único Virtual Headend unificado na AWS, obtendo até 75% de redução de CapEx e unificando o monitoramento.🛠️ Tech Stack / Tecnologias UtilizadasTerraform (v1.5+): Declarative multi-provider Infrastructure as Code.AWS & AWSCC Providers: Native Cloud Control API integration for bleeding-edge resources.AWS Elemental MediaConnect: High-quality video transport using SRT (Secure Reliable Transport) protocol.AWS Transit Gateway: Central hub routing IPsec VPN traffic with ECMP (Equal-Cost Multi-Path) active-active load balancing.🚀 How to Deploy / Como ExecutarPrerequisites / Pré-requisitosAWS CLI configured (aws configure)Terraform installed (v1.5.0+)Bash# 1. Clone the repo / Clone o repositório
-git clone [https://github.com/your-username/virtual-headend-broadcast.git](https://github.com/your-username/virtual-headend-broadcast.git)
+git clone [https://github.com/code-wfb/virtual-headend-broadcast.git](https://github.com/code-wfb/virtual-headend-broadcast.git)
 cd virtual-headend-broadcast
 
 # 2. Initialize working directory / Inicialize o diretório
